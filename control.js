@@ -5,7 +5,7 @@ const code2ws = new Map()
 const listCodes = () => {
     const arr = Array.from(code2ws.keys())
     const res = arr.map(v => (
-        {code: v, time: code2ws.get(v).time}
+        {code: v, time: code2ws.get(v).time, mac: code2ws.get(v).mac}
     ))
     console.log(res)
     return res;
@@ -28,15 +28,20 @@ wss.on('connection', function connection(ws, request) {
     };
 
     let code =  Math.floor(Math.random()*(999999-100000)) + 100000;
-    const match = request.url.match(/code=(\d+)/);
-    if (request.url.match(/code=(\d+)/)) {
+    let match = request.url.match(/code=(\d+)/);
+    if (match) {
         code = match[1];
+    }
+    match = request.url.match(/mac=([a-zA-Z0-9:]+)/);
+    let mac = ''
+    if (match) {
+        mac = match[1];
     }
     // let ip = request.connection.remoteAddress.replace('::ffff:', '');
     // console.log('ip is connected', ip)
     // console.log('ws',ws.sendData)
     code2ws.set(code, {
-        ws, time: new Date(),
+        ws, time: new Date(), mac,
     })
     ws.on('message', function incoming(message) {
         // console.log('imcoming message',message.toString())
